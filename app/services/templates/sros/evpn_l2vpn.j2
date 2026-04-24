@@ -1,3 +1,4 @@
+{% if evpn_l2vpn is defined %}
 {% for variant_name, variant_data in evpn_l2vpn.variant.items() %}
 {% for l2vpn_name, data in variant_data.items() %}
 
@@ -44,3 +45,4 @@ service
 
 {% endfor %}
 {% endfor %}
+{% endif %}

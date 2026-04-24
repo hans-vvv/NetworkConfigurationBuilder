@@ -46,5 +46,5 @@ except Exception:
 with db_session() as session:    
     printer = Printer(session=session)
 
-    config = printer.render_device(hostname="pe1.Site12")    
+    config = printer.render_device(hostname="pe1.Site9")    
     print(config)

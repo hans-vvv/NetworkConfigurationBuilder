@@ -9,11 +9,13 @@ exit
 #--------------------------------------------------
 # ROUTER BASE
 #--------------------------------------------------
+{% if bgp is defined %}
 {% for data in bgp.variant.default %}
 {% if data.bgp is defined %}
     autonomous-system {{ data.bgp.asn }}
 {% endif %}
 {% endfor %}
+{% endif %}
 
     #----------------------------------------------
     # INTERFACES (LAG PARENTS + LOOPBACKS)
