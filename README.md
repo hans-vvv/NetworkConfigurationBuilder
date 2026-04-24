@@ -14,7 +14,7 @@ April 2026
 
 ## What it does
 
-- Persists network topology (devices, interfaces, links) sourced from an  Excel document. In /tests an example file is included.
+- Persists network topology (devices, interfaces, links) sourced from an  Excel document. In /app an example file is included.
 - Accepts service, protocol and addressing intent defined in YAML
 - Computes complete, vendor-agnostic configuration intent
 - Renders vendor-specific device configurations using Jinja2 templates
