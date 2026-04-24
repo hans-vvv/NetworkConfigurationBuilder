@@ -1,0 +1,21 @@
+service: evpn_esi
+tenant: demo
+variant: default
+
+features: {}
+
+interface_features: {}
+
+parameters:
+  allocations:
+    evpn_esi: 
+      pool: evpn_esi_pool_demo
+
+selectors:  
+  devices:
+    evpn_esi:      
+      match:
+        role:
+          include: ["pe"]       
+        labels:
+          tenant: demo

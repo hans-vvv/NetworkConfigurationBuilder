@@ -1,0 +1,31 @@
+service: bgp
+tenant: demo
+variant: default
+
+selectors:
+  devices:  
+    bgp:
+      match:
+        labels:
+          tenant: demo
+        role:
+          include: ["pe", "rr"]
+
+    route_reflectors:
+      match:
+        labels:
+          tenant: demo
+        role:
+          include: ["rr"]
+          
+features:
+  bgp:
+    asn: 65011
+    rr:
+      mode: explicit
+      rrc_peer_group_name: CORE_RR_CLIENT
+      rr_peer_group_name: CORE_RR
+
+interface_features: {}
+
+parameters: {}

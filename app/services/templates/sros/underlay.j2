@@ -1,0 +1,104 @@
+#--------------------------------------------------
+# SYSTEM
+#--------------------------------------------------
+system
+    name {{ hostname }}
+exit
+
+
+#--------------------------------------------------
+# ROUTER BASE
+#--------------------------------------------------
+{% for data in bgp.variant.default %}
+{% if data.bgp is defined %}
+    autonomous-system {{ data.bgp.asn }}
+{% endif %}
+{% endfor %}
+
+    #----------------------------------------------
+    # INTERFACES (LAG PARENTS + LOOPBACKS)
+    #----------------------------------------------
+{% for iface in interfaces %}
+{% if iface.render_type == "lag_parent" or iface.name.lower().startswith("loopback") %}
+    interface "{{ iface.name }}"
+{% if iface.description %}
+        description "{{ iface.description }}"
+{% endif %}
+{% for ip_address in iface.iface_ip_addresses %}
+        address {{ ip_address }}
+{% endfor %}
+{% if "isis" in iface %}
+        isis {{ isis.process_id }}
+{% endif %}
+    exit
+{% endif %}
+{% endfor %}
+
+    #----------------------------------------------
+    # LAG MEMBERS
+    #----------------------------------------------
+{% for iface in interfaces %}
+{% if iface.render_type == "lag_member" %}
+    port {{ iface.name }}
+{% if iface.description %}
+        description "{{ iface.description }}"
+{% endif %}
+        lag "{{ iface.parent }}"
+    exit
+{% endif %}
+{% endfor %}
+
+    #----------------------------------------------
+    # IS-IS
+    #----------------------------------------------
+{% if isis is defined and "instances" in isis and "0" in isis.instances %}
+{% set isis_instance = isis.instances["0"] %}
+    isis {{ isis_instance.instance_id }}
+        net {{ isis_instance.area_address }}
+        level {{ isis_instance.level_type }}
+        metric-style {{ isis_instance.metric_style }}
+{% if isis_instance.set_overload_bit %}
+        overload
+{% endif %}
+{% for iface in isis_instance.interfaces %}
+        interface "{{ iface.iface_name }}"
+            level {{ iface.level_type }}
+            authentication-keychain "{{ iface.keychain_name }}"
+        exit
+{% endfor %}
+{% if sr is defined and sr.enabled %}
+        segment-routing
+            node-sid {{ sr.node_sid }}
+        exit
+{% endif %}
+    exit
+{% endif %}
+
+   {% if bgp is defined and "variant" in bgp and "default" in bgp.variant %}
+{% set bgp_default = bgp.variant["default"] %}
+
+    autonomous-system {{ bgp_default.asn }}
+
+    #----------------------------------------------
+    # BGP
+    #----------------------------------------------
+    bgp
+{% for nbr in bgp_default.neighbors %}
+        neighbor {{ nbr.neighbor_ip }}
+            remote-as {{ nbr.remote_as }}
+            peer-group "{{ nbr.peer_group }}"
+        exit
+{% endfor %}
+
+        #------------------------------------------
+        # BGP ADDRESS FAMILIES (BASELINE ENABLEMENT)
+        #------------------------------------------
+        family evpn
+        exit
+
+        family vpn-ipv4
+        exit
+
+    exit
+exit
+{% endif %}

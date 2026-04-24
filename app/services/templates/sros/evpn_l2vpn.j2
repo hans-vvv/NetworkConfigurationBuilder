@@ -1,0 +1,46 @@
+{% for variant_name, variant_data in evpn_l2vpn.variant.items() %}
+{% for l2vpn_name, data in variant_data.items() %}
+
+service
+    vpls {{ data.s_vlan }}
+        description "EVPN L2VPN {{ l2vpn_name }}"
+        customer 1
+
+        bgp-evpn
+            route-distinguisher {{ data.rd }}
+        exit
+
+        {# ---- SAPs come from interfaces ---- #}
+{% for iface in interfaces %}
+{% if iface.subinterfaces is defined %}
+{% for subif in iface.subinterfaces %}
+{% if subif.evpn_l2vpn is defined and subif.evpn_l2vpn.service == l2vpn_name %}
+        sap {{ iface.name }}:{{ subif.id }}
+            mtu {{ data.mtu }}
+{% if subif.evpn_l2vpn.esi is defined and subif.evpn_l2vpn.esi is string and subif.evpn_l2vpn.esi.isdigit() %}
+            ethernet-segment {{ subif.evpn_l2vpn.esi }}
+{% endif %}
+        exit
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+    exit
+
+    {# ---- IRB / VPRN (optional) ---- #}
+{% if data.irb is defined %}
+    vprn "{{ data.irb.vrf }}"
+        description "IRB for EVPN L2VPN {{ l2vpn_name }}"
+        customer 1
+
+        interface "irb-{{ data.s_vlan }}"
+            description "IRB for VLAN {{ data.s_vlan }} ({{ data.irb.prefix.prefix }})"
+            address {{ data.irb.prefix.prefix }}
+            no shutdown
+        exit
+    exit
+{% endif %}
+
+{% endfor %}
+{% endfor %}

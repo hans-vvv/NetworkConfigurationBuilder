@@ -1,0 +1,30 @@
+service: isis
+tenant: demo
+variant: core
+
+selectors:
+  devices:
+    isis:
+      match:
+        labels:
+          tenant: demo
+        role:
+          include: ["core", "rr", "pe"]
+ 
+features:
+  isis:
+    area_address: "31.0001"
+    instance_id: 0
+    level_type: level-2-only
+    metric_style: wide    
+    set_overload_bit_for_roles:
+      - rr
+    keychain_name: ISIS-KEYCHAIN
+
+interface_features:
+  isis:
+    instance_id: 0
+    level_type: level-2-only
+    keychain_name: ISIS-KEYCHAIN
+
+parameters: {}

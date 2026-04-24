@@ -1,0 +1,20 @@
+service: sr
+tenant: demo
+variant: default
+
+selectors:
+  devices: 
+    sr:
+      match:
+        labels:
+          tenant: demo
+        role:
+          include: ["pe", "rr", "core"]
+
+features: {}
+
+interface_features: {}
+
+parameters:
+  resource_pool_name:
+    sr_sid_pool_demo

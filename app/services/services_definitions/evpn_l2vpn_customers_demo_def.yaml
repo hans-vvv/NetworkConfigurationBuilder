@@ -1,0 +1,39 @@
+service: evpn_l2vpn
+tenant: demo
+variant: product_xyz
+
+selectors:
+  devices:  
+    evpn_l2vpn:
+      match:
+        labels:
+          tenant: demo
+        role:
+          include: ["pe"]
+
+parameters:
+  l2vpns:
+    - name: customer_A
+      mtu: 1514
+      qos_policy_name: BE      
+      allocations:
+        vlan:
+          poolname: 
+            vlan_pool_demo
+        rd:
+          poolname:
+            rd_pool_demo
+    - name: customer_B
+      mtu: 1514
+      qos_policy_name: BE      
+      allocations:
+        vlan:
+          poolname: 
+            vlan_pool_demo
+        rd:
+          poolname:
+            rd_pool_demo
+
+features: {}
+
+interface_features: {}
